@@ -500,12 +500,12 @@ export default function App() {
               { 
                 icon: <Shield className="text-primary" />, 
                 title: 'Cuidado & Qualidade', 
-                desc: 'Equipamento revisado e cristalino. Microfones com acabamento premium para que sua voz brilhe sem ruídos.' 
+                desc: 'Sistemas de som de alta fidelidade e tecnologia de ponta. Microfones profissionais que garantem uma captação vocal límpida e livre de interferências.' 
               },
               { 
                 icon: <Clock className="text-primary" />, 
                 title: 'Pontualidade Local', 
-                desc: 'Conhecemos Orlando de cabo a rabo. Chegamos cedo para que sua única preocupação seja escolher a primeira música.' 
+                desc: 'Especialistas na região de Orlando com rigoroso compromisso com a pontualidade. Garantimos uma logística eficiente para que sua única tarefa seja subir ao palco.' 
               },
               { 
                 icon: <ThumbsUp className="text-primary" />, 

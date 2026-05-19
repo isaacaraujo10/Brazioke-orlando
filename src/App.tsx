@@ -830,7 +830,7 @@ export default function App() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase tracking-wider text-text-muted">Hora de início do evento</label>
+                      <label className="text-xs font-bold uppercase tracking-wider text-text-muted">Hora do evento</label>
                       <div className="flex gap-2">
                         <select 
                           name="horarioInicio"

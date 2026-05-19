@@ -310,7 +310,13 @@ export default function App() {
             {['Início', 'Pacotes', 'Como Funciona', 'Depoimentos', 'FAQ'].map((item) => (
               <a 
                 key={item} 
-                href={`#${item.toLowerCase().replace(' ', '-')}`} 
+                href={item === 'Início' ? '#' : `#${item.toLowerCase().replace(' ', '-')}`} 
+                onClick={(e) => {
+                  if (item === 'Início') {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
                 className="text-sm font-medium hover:text-primary transition-colors uppercase tracking-widest"
               >
                 {item}
@@ -342,8 +348,14 @@ export default function App() {
               {['Início', 'Pacotes', 'Como Funciona', 'Depoimentos', 'FAQ'].map((item) => (
                 <a 
                   key={item} 
-                  href={`#${item.toLowerCase().replace(' ', '-')}`} 
-                  onClick={() => setIsMenuOpen(false)}
+                  href={item === 'Início' ? '#' : `#${item.toLowerCase().replace(' ', '-')}`} 
+                  onClick={(e) => {
+                    if (item === 'Início') {
+                      e.preventDefault();
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    setIsMenuOpen(false);
+                  }}
                   className="text-lg font-medium hover:text-primary py-2"
                 >
                   {item}
@@ -994,9 +1006,18 @@ export default function App() {
               <div>
                 <h5 className="font-bold text-white mb-6 uppercase tracking-widest text-xs">Menu</h5>
                 <ul className="space-y-4">
-                  {['Pacotes', 'Como Funciona', 'Depoimentos', 'FAQ', 'Agendamento'].map((item) => (
+                  {['Início', 'Pacotes', 'Como Funciona', 'Depoimentos', 'FAQ', 'Agendamento'].map((item) => (
                     <li key={item}>
-                      <a href={`#${item.toLowerCase().replace(' ', '-')}`} className="text-text-muted text-sm hover:text-primary transition-colors">
+                      <a 
+                        href={item === 'Início' ? '#' : `#${item.toLowerCase().replace(' ', '-')}`} 
+                        onClick={(e) => {
+                          if (item === 'Início') {
+                            e.preventDefault();
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        }}
+                        className="text-text-muted text-sm hover:text-primary transition-colors"
+                      >
                         {item}
                       </a>
                     </li>

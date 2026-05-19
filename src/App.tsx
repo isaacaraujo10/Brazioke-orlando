@@ -971,7 +971,7 @@ export default function App() {
           <div className="grid lg:grid-cols-3 gap-12 lg:gap-24 mb-16">
             <div>
               <div className="flex items-center mb-6">
-                <img src="https://i.imgur.com/0jeBxb1.png" alt="BRAZIOKÊ aluguel de karaokê Orlando" loading="lazy" className="h-[104px] md:h-[125px] w-auto object-contain" />
+                <img src="https://i.imgur.com/0jeBxb1.png" alt="BRAZIOKÊ aluguel de karaokê Orlando" loading="lazy" className="h-[52px] md:h-[62px] w-auto object-contain" />
               </div>
               <p className="text-text-muted leading-relaxed mb-8">
                 Transformando festas em shows inesquecíveis. Aluguel de karaoke profissional para a comunidade brasileira em Orlando e região.

@@ -402,6 +402,15 @@ export default function App() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
+                className="my-4 text-[13px] md:text-sm text-primary font-semibold text-center lg:text-left px-4 lg:px-0"
+              >
+                🗓️ As datas deste mês estão quase esgotadas — Garanta a sua
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
                 className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-10"
               >
@@ -581,7 +590,10 @@ export default function App() {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-5xl font-bold mb-4">Escolha seu <span className="text-primary">pacote</span></h2>
-            <p className="text-text-muted">Todos os pacotes incluem entrega, instalação e suporte técnico remoto.</p>
+            <p className="text-text-muted mb-4">Todos os pacotes incluem entrega, instalação e suporte técnico remoto.</p>
+            <div className="inline-block max-w-2xl px-6 py-2 text-center text-[13px] md:text-sm text-primary font-semibold tracking-wide bg-primary/5 rounded-full border border-primary/10">
+              💡 Serviços similares sem instalação incluída custam entre $300–$400 na região. Aqui tudo está incluso.
+            </div>
           </div>
           
           <div className="grid lg:grid-cols-3 gap-8">
@@ -650,6 +662,25 @@ export default function App() {
               </motion.div>
             ))}
           </div>
+
+          {/* Formas de pagamento aceitas */}
+          <div className="mt-16 text-center max-w-md mx-auto px-4">
+            <p className="text-xs uppercase tracking-widest text-[#aaaaaa]/70 font-semibold mb-3">Formas de pagamento aceitas:</p>
+            <div className="flex flex-wrap items-center justify-center gap-3 text-sm font-medium text-white/95">
+              <span className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/5 border border-white/5 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
+                Zelle
+              </span>
+              <span className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/5 border border-white/5 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
+                Cash App
+              </span>
+              <span className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/5 border border-white/5 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
+                Cash (Dinheiro)
+              </span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -699,14 +730,9 @@ export default function App() {
                     </div>
                     <p className="text-white/90 italic text-sm leading-relaxed mb-6">{t.text}</p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-secondary/30 rounded-full flex items-center justify-center font-bold text-primary">
-                      {t.initials}
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-sm text-white">{t.author}</h4>
-                      <p className="text-[10px] text-text-muted uppercase tracking-wider">{t.event}</p>
-                    </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-white">{t.author}</h4>
+                    <p className="text-[10px] text-text-muted uppercase tracking-wider">{t.event}</p>
                   </div>
                 </div>
               ))}
@@ -728,14 +754,9 @@ export default function App() {
                     </div>
                     <p className="text-white/90 italic text-lg leading-relaxed mb-6">{TESTIMONIALS[currentTestimonial].text}</p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-secondary/30 rounded-full flex items-center justify-center font-bold text-primary">
-                      {TESTIMONIALS[currentTestimonial].initials}
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-base text-white">{TESTIMONIALS[currentTestimonial].author}</h4>
-                      <p className="text-xs text-text-muted">{TESTIMONIALS[currentTestimonial].event}</p>
-                    </div>
+                  <div>
+                    <h4 className="font-bold text-base text-white">{TESTIMONIALS[currentTestimonial].author}</h4>
+                    <p className="text-xs text-text-muted">{TESTIMONIALS[currentTestimonial].event}</p>
                   </div>
                 </motion.div>
               </AnimatePresence>
@@ -754,6 +775,42 @@ export default function App() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tourists Section */}
+      <section id="turistas" className="py-12 md:py-20 bg-bg-dark/30 border-y border-white/5">
+        <div className="container mx-auto px-6">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <h2 className="text-3xl lg:text-5xl font-bold mb-4">Está de férias em Orlando?</h2>
+            <p className="text-lg md:text-xl text-primary font-semibold mb-6">Entregamos onde você estiver</p>
+            <p className="text-text-muted leading-relaxed text-sm md:text-base">
+              Seja num Airbnb, casa alugada, salão de festas ou hotel — levamos o karaokê profissional até você. 
+              Atendemos turistas brasileiros em toda a região de Orlando com a mesma qualidade e pontualidade.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
+            {[
+              { icon: "🏠", title: "Airbnb e casas de temporada" },
+              { icon: "🏨", title: "Hotéis e resorts" },
+              { icon: "🎉", title: "Salões e espaços de festa" }
+            ].map((bloco, idx) => (
+              <div key={idx} className="glass-card p-6 flex flex-col items-center text-center hover:border-primary/30 transition-all duration-300">
+                <span className="text-4xl mb-4" role="img" aria-label={bloco.title}>{bloco.icon}</span>
+                <h4 className="font-bold text-base md:text-lg text-white">{bloco.title}</h4>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-center">
+            <button 
+              onClick={() => handleGlobalRedirect(`https://wa.me/16892769150?text=Olá! Estou de férias em Orlando e gostaria de alugar um karaokê para onde estou me hospedando.`)}
+              className="btn-magenta w-full max-w-[60%] min-[481px]:w-auto min-[481px]:max-w-none px-8 py-[10px] min-[481px]:py-4 flex items-center justify-center gap-2 text-[14px] min-[481px]:text-sm md:text-base font-bold uppercase tracking-wider transition-all hover:scale-[1.02]"
+            >
+              <Phone size={18} /> Falar no WhatsApp agora
+            </button>
           </div>
         </div>
       </section>
@@ -956,23 +1013,36 @@ export default function App() {
           </div>
           
           <div className="max-w-3xl mx-auto space-y-4">
-            {FAQ_ITEMS.map((item, idx) => (
-              <AccordionItem key={idx} question={item.q} answer={item.a} />
-            ))}
+            {FAQ_ITEMS.map((item, idx) => {
+              const shouldOpen = idx < 3;
+              return (
+                <AccordionItem 
+                  key={idx} 
+                  question={item.q} 
+                  answer={item.a} 
+                  defaultOpen={shouldOpen} 
+                />
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Onde Atendemos Section */}
-      <section id="onde-atendemos" className="py-12 md:py-20 bg-bg-dark">
+      <section id="onde-atendemos" className="py-12 md:py-20 bg-bg-dark text-center">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
+          <div className="mb-12">
             <h2 className="text-3xl lg:text-5xl font-bold mb-4">Onde <span className="text-primary">Atendemos</span></h2>
             <p className="text-text-muted">Cobrimos toda a região metropolitana de Orlando</p>
           </div>
-          <div className="flex items-center justify-center gap-4 py-8 glass-card border-white/5 max-w-2xl mx-auto">
-            <MapPin className="text-primary" size={32} />
-            <span className="text-2xl md:text-3xl font-bold text-white uppercase tracking-tight">Orlando e Região</span>
+          
+          <div className="max-w-3xl mx-auto space-y-3">
+            <p className="text-[13px] text-white/80 leading-relaxed font-normal">
+              Orlando • Kissimmee • Winter Garden • Clermont • Celebration - Davenport • Lake Buena Vista • Sanford • Altamonte Springs - Windermere • e mais...
+            </p>
+            <p className="text-[12px] text-text-muted/60 font-normal">
+              Entrega Gratuita em toda região.
+            </p>
           </div>
         </div>
       </section>
@@ -1104,37 +1174,46 @@ export default function App() {
       </AnimatePresence>
 
       {/* Floating WhatsApp Button */}
-      <motion.a 
-        href="https://wa.me/16892769150?text=Olá,%20BRAZIOKÊ!%20🎤%20Vim%20pelo%20site%20e%20tenho%20interesse%20em%20alugar%20o%20karaokê%20para%20minha%20festa%20em%20Orlando.%20Podem%20me%20ajudar?"
-        target="_blank"
-        rel="noopener noreferrer"
-        animate={{ 
-          scale: [1, 1.1, 1],
-        }}
-        transition={{ 
-          duration: 2, 
-          repeat: Infinity, 
-          ease: "easeInOut" 
-        }}
-        className="fixed bottom-[-6px] right-[-16px] sm:bottom-[-8px] sm:right-[-12px] z-[60] flex flex-col items-center group"
-        aria-label="Falar no WhatsApp"
-      >
-        <div className="w-32 h-32 md:w-44 md:h-44 flex items-center justify-center hover:scale-110 transition-transform duration-300 drop-shadow-[0_10px_15px_rgba(0,0,0,0.3)]">
-          <img 
-            src="https://i.imgur.com/JW5EuSf.png" 
-            alt="WhatsApp" 
-            className="w-full h-full object-contain"
-          />
+      <div className="fixed bottom-2 right-2 md:bottom-4 md:right-4 z-[60] select-none pointer-events-none">
+        <div className="relative pointer-events-auto">
+          {/* Badge compacto minimalista estilo notificação */}
+          <div className="absolute top-4 right-4 md:top-6 md:right-6 bg-primary text-white text-[10px] font-bold px-[5px] py-[2px] rounded-full shadow-[0_2px_10px_rgba(224,64,251,0.5)] z-10 flex items-center justify-center whitespace-nowrap animate-pulse">
+            ⚡5min
+          </div>
+
+          <motion.a 
+            href="https://wa.me/16892769150?text=Olá,%20BRAZIOKÊ!%20🎤%20Vim%20pelo%20site%20e%20tenho%20interesse%20em%20alugar%20o%20karaokê%20para%20minha%20festa%20em%20Orlando.%20Podem%20me%20ajudar?"
+            target="_blank"
+            rel="noopener noreferrer"
+            animate={{ 
+              scale: [1, 1.05, 1],
+            }}
+            transition={{ 
+              duration: 2, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+            className="block"
+            aria-label="Falar no WhatsApp"
+          >
+            <div className="w-24 h-24 md:w-36 md:h-36 flex items-center justify-center hover:scale-110 transition-transform duration-300 drop-shadow-[0_10px_15px_rgba(0,0,0,0.3)]">
+              <img 
+                src="https://i.imgur.com/JW5EuSf.png" 
+                alt="WhatsApp" 
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </motion.a>
         </div>
-      </motion.a>
+      </div>
 
       {/* Global Redirect Modal Removed as per user request for direct access */}
     </div>
   );
 }
 
-function AccordionItem({ question, answer }: { question: string; answer: string, key?: any }) {
-  const [isOpen, setIsOpen] = useState(false);
+function AccordionItem({ question, answer, defaultOpen = false }: { question: string; answer: string; defaultOpen?: boolean; key?: any }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   
   return (
     <div className="glass-card overflow-hidden">

@@ -167,6 +167,76 @@ export default function App() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
+  // Carrossel Galeria de Eventos State
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
+  const GALLERY_IMAGES = [
+    'https://i.imgur.com/8LyNPl1.jpg',
+    'https://i.imgur.com/nJDM8be.jpg',
+    'https://i.imgur.com/Vb27qgU.jpg',
+    'https://i.imgur.com/rlJfwWM.jpg',
+    'https://i.imgur.com/J9hB47u.jpg',
+    'https://i.imgur.com/Ab5Fx0e.jpg',
+    'https://i.imgur.com/QdETD1C.jpg',
+    'https://i.imgur.com/ghRIKyW.jpg'
+  ];
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const prevSlide = () => {
+    setCarouselIndex((prev) => (prev - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length);
+  };
+
+  const nextSlide = () => {
+    setCarouselIndex((prev) => (prev + 1) % GALLERY_IMAGES.length);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const diff = touchStartX.current - touchEndX.current;
+    if (diff > 50) {
+      nextSlide();
+    } else if (diff < -50) {
+      prevSlide();
+    }
+  };
+
+  // Autoplay: 5s para o primeiro item, 3s para os subsequentes
+  useEffect(() => {
+    const delay = carouselIndex === 0 ? 5000 : 3000;
+    const timer = setInterval(() => {
+      nextSlide();
+    }, delay);
+    return () => clearInterval(timer);
+  }, [carouselIndex]);
+
+  const getTranslateX = () => {
+    if (windowWidth < 768) {
+      return carouselIndex * 100;
+    } else if (windowWidth < 1024) {
+      const index = carouselIndex % 4;
+      return index * 50;
+    } else {
+      const index = carouselIndex % 3;
+      return index * 33.3333;
+    }
+  };
+
   const handleGlobalRedirect = (link: string) => {
     // Redirecting immediately to avoid browser popup blocks/confirmations
     window.location.href = link;
@@ -327,7 +397,7 @@ export default function App() {
 
           {/* Mobile Toggle */}
           <div className="flex items-center gap-4 lg:hidden">
-            <a href="tel:+16892769150" className="p-2 bg-primary/20 rounded-full text-white">
+            <a href="tel:+16892769150" className="p-2 bg-primary/20 rounded-full text-white md:hidden">
               <Phone size={24} />
             </a>
             <button className="text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -416,35 +486,11 @@ export default function App() {
               >
                 <a href="#pacotes" className="btn-magenta w-full sm:w-auto text-center px-8 py-4">Ver Pacotes & Preços</a>
                 <button 
-                  onClick={() => handleGlobalRedirect(`https://wa.me/16892769150?text=Olá! Gostaria de saber mais sobre o aluguel de karaokê.`)}
-                  className="btn-outline w-full sm:w-auto px-8 py-4 flex items-center justify-center gap-2"
+                  onClick={() => handleGlobalRedirect(`https://wa.me/16892769150?text=Olá,%20BRAZIOKÊ!%20🎤%20Vim%20pelo%20site%20e%20tenho%20interesse%20em%20alugar%20o%20karaokê%20para%20minha%20festa%20em%20Orlando.%20Podem%20me%20ajudar?`)}
+                  className="btn-outline w-full max-w-[220px] sm:max-w-none sm:w-auto px-8 py-[10px] sm:py-4 flex items-center justify-center gap-2 text-[14px] sm:text-base whitespace-nowrap"
                 >
-                  <Phone size={18} /> Falar no WhatsApp
+                  💬 WhatsApp
                 </button>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35 }}
-                className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 pt-6 border-t border-white/10"
-              >
-                <div className="flex items-center gap-2">
-                  <Star size={16} className="text-primary fill-primary" />
-                  <span className="text-xs font-bold text-white"><span className="text-primary">+150</span> festas realizadas em Orlando</span>
-                </div>
-                <div className="hidden sm:block w-px h-4 bg-white/10" />
-                <div className="flex items-center gap-2">
-                  <div className="flex text-primary">
-                    {Array(5).fill(0).map((_, i) => <Star key={i} size={12} fill="currentColor" />)}
-                  </div>
-                  <span className="text-xs font-bold text-white"><span className="text-primary">5.0</span> estrelas no Google</span>
-                </div>
-                <div className="hidden sm:block w-px h-4 bg-white/10" />
-                <div className="flex items-center gap-2">
-                  <Globe size={16} className="text-primary" />
-                  <span className="text-xs font-bold text-white uppercase flex items-center gap-1">Atendimento em <span className="text-primary">português</span></span>
-                </div>
               </motion.div>
             </div>
 
@@ -452,38 +498,80 @@ export default function App() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.4 }}
-              className="lg:w-1/2 relative space-y-4"
+              className="lg:w-1/2 relative flex flex-col w-full"
             >
-              <div className="grid grid-cols-2 gap-4">
-                <div className="relative z-10 rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(224,64,251,0.2)] border border-white/10 group h-[300px] lg:h-[450px]">
-                  <img 
-                    src="https://i.imgur.com/bC8TFzr.jpg" 
-                    alt="Festa de karaokê com brasileiros em Orlando" 
-                    referrerPolicy="no-referrer"
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 bg-white/5"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg-dark/40 via-transparent to-transparent" />
-                </div>
-                
-                <div className="flex flex-col gap-4">
-                  <div className="relative z-10 rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(224,64,251,0.1)] border border-white/10 group h-[140px] lg:h-[215px]">
-                    <img 
-                      src="https://i.imgur.com/jAKs3b5.jpg" 
-                      alt="Evento Real BrazioKê" 
-                      referrerPolicy="no-referrer"
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 bg-white/5"
-                    />
+              {/* 📸 Galeria de Eventos - Carrossel de Eventos Realizados */}
+              <div className="w-full">
+                <div className="relative w-full overflow-hidden group/carousel">
+                  {/* Track Wrapper */}
+                  <div className="overflow-hidden rounded-2xl border border-white/5 bg-black/10 p-2 relative">
+                    <div 
+                      className="flex transition-transform duration-500 ease-in-out"
+                      style={{ transform: `translateX(-${getTranslateX()}%)` }}
+                      onTouchStart={handleTouchStart}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
+                    >
+                      {GALLERY_IMAGES.map((imgUrl, i) => (
+                        <div 
+                          key={i} 
+                          className="w-full md:w-1/2 lg:w-1/3 shrink-0 px-2"
+                        >
+                          <div className="relative overflow-hidden rounded-xl border border-white/10 bg-white/5 h-[260px] md:h-[340px] group/item">
+                            <img 
+                              src={imgUrl} 
+                              alt={`Eventos BrazioKê ${i + 1}`} 
+                              referrerPolicy="no-referrer"
+                              loading="lazy"
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover/item:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-80" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Navigation Arrows for Desktop */}
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        prevSlide();
+                      }}
+                      className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-9 h-9 items-center justify-center rounded-full bg-black/75 border border-primary/40 text-primary hover:bg-primary/20 hover:border-primary transition-all z-20 hover:scale-105"
+                      aria-label="Slide anterior"
+                    >
+                      <ChevronLeft size={18} />
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        nextSlide();
+                      }}
+                      className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 items-center justify-center rounded-full bg-black/75 border border-primary/40 text-primary hover:bg-primary/20 hover:border-primary transition-all z-20 hover:scale-105"
+                      aria-label="Próximo slide"
+                    >
+                      <ChevronRight size={18} />
+                    </button>
                   </div>
-                  <div className="relative z-10 rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(224,64,251,0.1)] border border-white/10 group h-[140px] lg:h-[215px]">
-                    <img 
-                      src="https://i.imgur.com/cAQUH67.jpg" 
-                      alt="Festa brasileira com karaokê em Orlando" 
-                      referrerPolicy="no-referrer"
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 bg-white/5"
-                    />
+
+                  {/* Indicators for Mobile (Dots) */}
+                  <div className="flex justify-center gap-1.5 mt-3.5">
+                    {GALLERY_IMAGES.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCarouselIndex(i);
+                        }}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          carouselIndex === i ? 'bg-primary w-5' : 'bg-white/20'
+                        }`}
+                        aria-label={`Ir para foto ${i + 1}`}
+                      />
+                    ))}
                   </div>
                 </div>
               </div>
@@ -596,71 +684,83 @@ export default function App() {
             </div>
           </div>
           
-          <div className="grid lg:grid-cols-3 gap-8">
-            {PACKAGES.map((pkg, idx) => (
-              <motion.div
-                key={pkg.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className={`flex flex-col glass-card p-0 overflow-hidden relative group transition-all duration-500 hover:-translate-y-2 ${pkg.popular ? 'package-glow-popular border-primary lg:scale-105 z-10' : 'package-glow hover:border-primary/30'}`}
-              >
-                {/* Background Glow Effect */}
-                <div className={`absolute inset-0 rounded-xl transition-opacity duration-500 -z-10 ${pkg.popular ? 'opacity-20' : 'opacity-0 group-hover:opacity-10'} magenta-gradient blur-2xl`} />
-                
-                {/* Package Image Area */}
-                <div className="w-full h-64 overflow-hidden relative border-b border-white/10 bg-[#1a001a]">
-                  <img 
-                    src={pkg.image} 
-                    alt="Kit de karaokê profissional para aluguel em Orlando" 
-                    loading="lazy"
-                    className="w-full h-full object-contain p-6 transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md text-white text-[9px] uppercase font-bold tracking-tighter px-2 py-1 rounded border border-white/10 z-20">
-                    Som HD Profissional
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1a001a] via-transparent to-transparent opacity-60" />
-                  
-                  {pkg.popular && (
-                    <div className="absolute top-4 left-4 magenta-gradient text-white text-[10px] uppercase font-black tracking-widest px-3 py-1 rounded-full shadow-lg z-20">
-                      Mais Popular
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 max-w-6xl mx-auto items-stretch">
+            {PACKAGES.map((pkg, idx) => {
+              const isPopular = pkg.popular;
+              return (
+                <motion.div
+                  key={pkg.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className={`flex flex-col rounded-3xl overflow-hidden relative group transition-all duration-500 p-6 md:p-8 border-2 ${
+                    isPopular 
+                      ? 'border-primary animate-border-pulse-popular lg:scale-[1.05] z-10 bg-gradient-to-b from-[#1c0228] to-[#040008] shadow-[0_15px_40px_rgba(224,64,251,0.4)]' 
+                      : 'border-primary/40 animate-border-pulse bg-gradient-to-b from-[#12001c] to-[#040008] shadow-[0_10px_30px_rgba(0,0,0,0.5)] hover:border-primary/65'
+                  }`}
+                >
+                  {/* Top area of the card */}
+                  {isPopular && (
+                    <div className="flex justify-end mb-4">
+                      <div className="bg-primary text-white text-[9px] md:text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-[0_0_15px_rgba(224,64,251,0.6)] animate-badge-pulse-popular">
+                        🔥 Mais Popular
+                      </div>
                     </div>
                   )}
-                </div>
 
-                <div className="p-8 flex flex-col flex-grow relative">
-                  
-                  <div className="mb-6 flex justify-between items-start">
-                    <div className="p-3 bg-white/5 rounded-xl">{pkg.icon}</div>
-                    <div className="text-right">
-                      <span className="text-3xl font-bold text-white">{pkg.price}</span>
-                      <span className="text-xs text-text-muted block font-medium">/ ALUGUEL</span>
-                    </div>
+                  {/* Package Image Area */}
+                  <div className="w-full h-44 overflow-hidden relative rounded-2xl bg-black/30 border border-white/5 mb-6">
+                    <img 
+                      src={pkg.image} 
+                      alt={pkg.name} 
+                      loading="lazy"
+                      className="w-full h-full object-contain p-4 transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg-dark/60 via-transparent to-transparent opacity-40" />
                   </div>
 
-                  <h3 className="text-2xl font-bold mb-2">{pkg.name}</h3>
-                  <p className="text-text-muted text-sm mb-6 italic leading-relaxed">{pkg.description}</p>
-                  
-                  <ul className="space-y-3 mb-8 flex-grow">
+                  {/* Title and Price Info */}
+                  <div className="mb-4">
+                    {/* Ícone do pacote */}
+                    <div className="inline-flex items-center justify-center p-3.5 bg-white/5 border border-white/10 rounded-2xl text-primary mb-4">
+                      {pkg.icon}
+                    </div>
+                    {/* Nome do pacote acima do preço */}
+                    <div className="mb-2">
+                      <h3 className="text-2xl font-extrabold text-white tracking-wide uppercase">{pkg.name}</h3>
+                    </div>
+                    {/* Preço em tamanho grande e bold com cor rosa neon e animação de pulsação */}
+                    <div className="flex items-baseline gap-1">
+                      <span className={`text-4xl md:text-5xl font-extrabold text-primary tracking-tight animate-price-pulse-${idx}`}>
+                        {pkg.price}
+                      </span>
+                      <span className="text-xs text-text-muted uppercase tracking-widest font-semibold">/ aluguel</span>
+                    </div>
+                    <p className="text-white/80 text-sm mt-3 font-medium italic min-h-[40px]">{pkg.description}</p>
+                  </div>
+
+                  {/* Lista de itens com ícone de check colorido */}
+                  <ul className="space-y-3 mb-8 flex-grow border-t border-white/5 pt-6">
                     {pkg.items.map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-sm">
-                        <Check className="text-primary w-5 h-5 shrink-0" />
-                        <span className="text-white/80">{item}</span>
+                      <li key={i} className="flex items-start gap-2.5 text-sm">
+                        <Check className="text-primary w-5 h-5 shrink-0 bg-primary/10 rounded-full p-0.5" />
+                        <span className="text-white/90 font-medium leading-relaxed">{item}</span>
                       </li>
                     ))}
                   </ul>
-                  
+
+                  {/* Botão "Fazer Agendamento" com gradiente roxo→rosa e hover com brilho */}
                   <a 
                     href="#agendamento"
                     onClick={() => setSelectedPackage(pkg.id)}
-                    className={`w-full block text-center py-4 rounded-xl font-bold transition-all ${pkg.popular ? 'magenta-gradient text-white hover:opacity-90' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                    className="w-full block text-center py-4 rounded-xl font-bold transition-all bg-gradient-to-r from-[#9c27b0] to-[#e040fb] text-white hover:shadow-[0_0_20px_rgba(224,64,251,0.8)] hover:scale-[1.02] active:scale-[0.98] duration-300"
                   >
                     Fazer Agendamento
                   </a>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
 
           {/* Formas de pagamento aceitas */}
@@ -779,68 +879,11 @@ export default function App() {
         </div>
       </section>
 
-      {/* Tourists Section */}
-      <section id="turistas" className="py-12 md:py-20 bg-bg-dark/30 border-y border-white/5">
-        <div className="container mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl lg:text-5xl font-bold mb-4">Está de férias em Orlando?</h2>
-            <p className="text-lg md:text-xl text-primary font-semibold mb-6">Entregamos onde você estiver</p>
-            <p className="text-text-muted leading-relaxed text-sm md:text-base">
-              Seja num Airbnb, casa alugada, salão de festas ou hotel — levamos o karaokê profissional até você. 
-              Atendemos turistas brasileiros em toda a região de Orlando com a mesma qualidade e pontualidade.
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
-            {[
-              { icon: "🏠", title: "Airbnb e casas de temporada" },
-              { icon: "🏨", title: "Hotéis e resorts" },
-              { icon: "🎉", title: "Salões e espaços de festa" }
-            ].map((bloco, idx) => (
-              <div key={idx} className="glass-card p-6 flex flex-col items-center text-center hover:border-primary/30 transition-all duration-300">
-                <span className="text-4xl mb-4" role="img" aria-label={bloco.title}>{bloco.icon}</span>
-                <h4 className="font-bold text-base md:text-lg text-white">{bloco.title}</h4>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex justify-center">
-            <button 
-              onClick={() => handleGlobalRedirect(`https://wa.me/16892769150?text=Olá! Estou de férias em Orlando e gostaria de alugar um karaokê para onde estou me hospedando.`)}
-              className="btn-magenta w-full max-w-[60%] min-[481px]:w-auto min-[481px]:max-w-none px-8 py-[10px] min-[481px]:py-4 flex items-center justify-center gap-2 text-[14px] min-[481px]:text-sm md:text-base font-bold uppercase tracking-wider transition-all hover:scale-[1.02]"
-            >
-              <Phone size={18} /> Falar no WhatsApp agora
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* Booking Form Section */}
       <section id="agendamento" className="py-12 md:py-20">
         <div className="container mx-auto px-6">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="max-w-4xl mx-auto mb-12"
-          >
-            <div className="relative rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(224,64,251,0.2)] border border-white/10 group">
-              <img 
-                src="https://i.imgur.com/FRRUNQG.jpg" 
-                alt="Festa de karaokê com brasileiros em Orlando" 
-                referrerPolicy="no-referrer"
-                loading="lazy"
-                className="w-full h-[300px] md:h-[400px] object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-bg-dark/60 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6">
-                <p className="text-white font-bold text-lg md:text-xl flex items-center gap-2">
-                   <Star className="text-primary w-5 h-5 fill-primary" /> Eventos Reais, Diversão Real
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-5xl font-bold mb-4">Faça seu <span className="text-primary">Agendamento</span></h2>
             <p className="text-text-muted">Preencha os dados e garanta sua data agora mesmo</p>
@@ -923,22 +966,22 @@ export default function App() {
                       </div>
                     </div>
                     
-                    <div className="space-y-4 pt-4 border-t border-white/10">
+                    <div className="space-y-4 pt-4 border-t border-white/10 text-center md:text-left">
                       <h4 className="text-sm font-bold uppercase tracking-widest text-primary">Itens Adicionais (Opcionais)</h4>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                         {OPTIONALS.map((opt) => (
                           <button
                             key={opt.name}
                             type="button"
                             onClick={() => toggleOptional(opt.name)}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-[10px] md:text-sm font-bold ${
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-[11px] md:text-xs font-bold ${
                               selectedOptionals.includes(opt.name)
                                 ? 'bg-primary/20 border-primary text-white'
                                 : 'bg-white/5 border-white/10 text-white/50 hover:border-white/30'
                             }`}
                           >
-                            {selectedOptionals.includes(opt.name) ? <Check size={14} /> : <div className="w-3.5 h-3.5 rounded border border-white/30" />}
-                            {opt.name} ({opt.price})
+                            {selectedOptionals.includes(opt.name) ? <Check size={14} className="shrink-0" /> : <div className="w-3.5 h-3.5 rounded border border-white/30 shrink-0" />}
+                            <span className="whitespace-nowrap">{opt.name} ({opt.price})</span>
                           </button>
                         ))}
                       </div>
@@ -1174,10 +1217,10 @@ export default function App() {
       </AnimatePresence>
 
       {/* Floating WhatsApp Button */}
-      <div className="fixed bottom-2 right-2 md:bottom-4 md:right-4 z-[60] select-none pointer-events-none">
+      <div className="hidden md:block fixed bottom-2 right-2 md:bottom-4 md:right-4 z-[60] select-none pointer-events-none">
         <div className="relative pointer-events-auto">
           {/* Badge compacto minimalista estilo notificação */}
-          <div className="absolute top-4 right-4 md:top-6 md:right-6 bg-primary text-white text-[10px] font-bold px-[5px] py-[2px] rounded-full shadow-[0_2px_10px_rgba(224,64,251,0.5)] z-10 flex items-center justify-center whitespace-nowrap animate-pulse">
+          <div className="absolute max-[480px]:top-[8px] max-[480px]:right-[8px] min-[481px]:top-4 min-[481px]:right-4 md:top-6 md:right-6 bg-primary text-white text-[10px] font-bold px-[5px] py-[2px] rounded-full shadow-[0_2px_10px_rgba(224,64,251,0.5)] z-10 flex items-center justify-center whitespace-nowrap animate-pulse">
             ⚡5min
           </div>
 
@@ -1196,11 +1239,11 @@ export default function App() {
             className="block"
             aria-label="Falar no WhatsApp"
           >
-            <div className="w-24 h-24 md:w-36 md:h-36 flex items-center justify-center hover:scale-110 transition-transform duration-300 drop-shadow-[0_10px_15px_rgba(0,0,0,0.3)]">
+            <div className="max-[480px]:w-[64px] max-[480px]:h-[64px] min-[481px]:w-24 min-[481px]:h-24 md:w-36 md:h-36 flex items-center justify-center hover:scale-110 transition-transform duration-300 drop-shadow-[0_10px_15px_rgba(0,0,0,0.3)]">
               <img 
                 src="https://i.imgur.com/JW5EuSf.png" 
                 alt="WhatsApp" 
-                className="w-full h-full object-contain"
+                className="max-[480px]:w-[36px] max-[480px]:h-[36px] w-full h-full object-contain"
               />
             </div>
           </motion.a>

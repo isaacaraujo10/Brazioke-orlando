@@ -331,16 +331,16 @@ export default function App() {
   }, []);
 
   // Adição 3: Web Share API / Copy Fallback
-  const copyFallback = () => {
-    navigator.clipboard.writeText("https://www.braziokeorlando.com").then(() => {
+  const copyFallback = (texto: string) => {
+    navigator.clipboard.writeText(texto).then(() => {
       setShowShareToast(true);
       setTimeout(() => {
         setShowShareToast(false);
       }, 3000);
     }).catch(() => {
       try {
-        const tempInput = document.createElement("input");
-        tempInput.value = "https://www.braziokeorlando.com";
+        const tempInput = document.createElement("textarea");
+        tempInput.value = texto;
         document.body.appendChild(tempInput);
         tempInput.select();
         document.execCommand("copy");
@@ -356,20 +356,20 @@ export default function App() {
   };
 
   const handleShare = async () => {
-    const shareData = {
-      title: "BrazioKê Orlando 🎤",
-      text: "Olha que serviço incrível que encontrei aqui em Orlando! Eles levam um karaokê profissional até a sua casa, Airbnb ou salão de festa — com entrega, instalação e +25.000 músicas. Atendimento em português! Perfeito para festas e aniversários 🎉",
-      url: "https://www.braziokeorlando.com"
-    };
+    const textoCompleto = `🎤 Olha que serviço incrível aqui em Orlando!\n\nEles levam um karaokê profissional até a sua casa, Airbnb ou salão de festa — com entrega, instalação e mais de 25.000 músicas. Atendimento 100% em português! Perfeito para festas e aniversários 🎉\n\nAcesse agora: https://www.braziokeorlando.com`;
 
     if (navigator.share) {
       try {
-        await navigator.share(shareData);
+        await navigator.share({
+          text: textoCompleto
+        });
       } catch (err) {
-        copyFallback();
+        if (err instanceof Error && err.name !== 'AbortError') {
+          copyFallback(textoCompleto);
+        }
       }
     } else {
-      copyFallback();
+      copyFallback(textoCompleto);
     }
   };
 
@@ -1017,7 +1017,7 @@ export default function App() {
                   exit={{ opacity: 0, y: -5 }}
                   className="text-xs text-green-400 mt-3 font-medium tracking-wide"
                 >
-                  ✅ Link copiado! Cole no WhatsApp ou Instagram para indicar.
+                  ✅ Link copiado! Cole no WhatsApp para indicar.
                 </motion.p>
               )}
             </AnimatePresence>

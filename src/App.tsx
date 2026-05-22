@@ -179,6 +179,16 @@ export default function App() {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
+  // Adição 1: Timer bar countdown
+  const [timeLeft, setTimeLeft] = useState('00:00:00');
+
+  // Adição 2: Counter state & ref
+  const [partyCount, setPartyCount] = useState(0);
+  const counterRef = useRef<HTMLDivElement>(null);
+
+  // Adição 3: Share toast state
+  const [showShareToast, setShowShareToast] = useState(false);
+
   const GALLERY_IMAGES = [
     'https://i.imgur.com/8LyNPl1.jpg',
     'https://i.imgur.com/nJDM8be.jpg',
@@ -246,6 +256,121 @@ export default function App() {
   const handleGlobalRedirect = (link: string) => {
     // Redirecting immediately to avoid browser popup blocks/confirmations
     window.location.href = link;
+  };
+
+  // Adição 1: Countdown 24h timer (midnight resets)
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0); // Next midnight
+      const diff = midnight.getTime() - now.getTime();
+      
+      if (diff <= 0) {
+        return '24:00:00';
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      const hStr = String(hours).padStart(2, '0');
+      const mStr = String(minutes).padStart(2, '0');
+      const sStr = String(seconds).padStart(2, '0');
+
+      return `${hStr}:${mStr}:${sStr}`;
+    };
+
+    setTimeLeft(calculateTimeLeft());
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Adição 2: Intersection Observer for animating partyCount from 0 to 150
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      const [entry] = entries;
+      if (entry.isIntersecting) {
+        let start = 0;
+        const end = 150;
+        const duration = 3500; // 3.5 seconds
+        const startTime = performance.now();
+
+        const animateCount = (now: number) => {
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          
+          // Easing function: easeOutQuad
+          const easeOutQuad = (t: number) => t * (2 - t);
+          const currentCount = Math.floor(easeOutQuad(progress) * end);
+          
+          setPartyCount(currentCount);
+
+          if (progress < 1) {
+            requestAnimationFrame(animateCount);
+          }
+        };
+
+        requestAnimationFrame(animateCount);
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: 0.1 });
+
+    if (counterRef.current) {
+      observer.observe(counterRef.current);
+    }
+
+    return () => {
+      if (counterRef.current) {
+        observer.unobserve(counterRef.current);
+      }
+    };
+  }, []);
+
+  // Adição 3: Web Share API / Copy Fallback
+  const copyFallback = () => {
+    navigator.clipboard.writeText("https://www.braziokeorlando.com").then(() => {
+      setShowShareToast(true);
+      setTimeout(() => {
+        setShowShareToast(false);
+      }, 3000);
+    }).catch(() => {
+      try {
+        const tempInput = document.createElement("input");
+        tempInput.value = "https://www.braziokeorlando.com";
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        setShowShareToast(true);
+        setTimeout(() => {
+          setShowShareToast(false);
+        }, 3000);
+      } catch (e) {
+        console.error("Clipboard copy failed", e);
+      }
+    });
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: "BrazioKê Orlando 🎤",
+      text: "Olha que serviço incrível que encontrei aqui em Orlando! Eles levam um karaokê profissional até a sua casa, Airbnb ou salão de festa — com entrega, instalação e +25.000 músicas. Atendimento em português! Perfeito para festas e aniversários 🎉",
+      url: "https://www.braziokeorlando.com"
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        copyFallback();
+      }
+    } else {
+      copyFallback();
+    }
   };
 
   useEffect(() => {
@@ -382,8 +507,18 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
+      {/* Fixed Countdown Timer Top Bar */}
+      <div className="fixed top-0 left-0 w-full h-[36px] md:h-[40px] bg-[#1a0a2e] border-b border-[#e040fb] flex items-center justify-center px-4 z-[60] text-white text-[12px] md:text-[13px] font-medium tracking-wide">
+        <span className="hidden sm:inline">
+          ⏳ Condição especial expira em <span className="text-[#e040fb] font-mono font-bold">{timeLeft}</span> — Reserve hoje e garanta seu karaokê
+        </span>
+        <span className="inline sm:hidden">
+          ⏳ Oferta expira em <span className="text-[#e040fb] font-mono font-bold">{timeLeft}</span>
+        </span>
+      </div>
+
       {/* Header */}
-      <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-bg-dark/95 backdrop-blur-md shadow-lg py-3' : 'bg-transparent py-6'}`}>
+      <header className={`fixed top-[36px] md:top-[40px] left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-bg-dark/95 backdrop-blur-md shadow-lg py-3' : 'bg-transparent py-6'}`}>
         <div className="container mx-auto px-6 flex items-center justify-between">
           <a href="#" className="flex items-center gap-2 group">
             <img src="https://i.imgur.com/0jeBxb1.png" alt="BRAZIOKÊ Logo" loading="lazy" className="h-[96px] md:h-[143px] w-auto object-contain transition-transform group-hover:scale-105" />
@@ -455,7 +590,7 @@ export default function App() {
       </header>
 
       {/* Hero Section */}
-      <section id="inicio" className="relative pt-32 md:pt-40 pb-12 md:pb-16 overflow-hidden">
+      <section id="inicio" className="relative pt-[164px] md:pt-[200px] pb-12 md:pb-16 overflow-hidden">
         {/* Background glow - Reduced opacity/blur for performance */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[80px] -z-10" />
         
@@ -598,9 +733,22 @@ export default function App() {
       {/* How it Works */}
       <section id="como-funciona" className="py-12 md:py-20">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
+          <div className="text-center mb-10">
             <h2 className="text-3xl lg:text-5xl font-bold mb-4">Como <span className="text-primary">funciona</span></h2>
             <p className="text-text-muted">Simples, rápido e sem complicação</p>
+
+            {/* Adição 2: Bloco com contador animado de festas realizadas */}
+            <div ref={counterRef} className="mt-8 flex flex-col items-center select-none">
+              <div className="text-[48px] md:text-[64px] font-extrabold text-[#e040fb] tracking-tight leading-none drop-shadow-[0_0_20px_rgba(224,64,251,0.6)]">
+                +{partyCount}
+              </div>
+              <p className="text-sm md:text-lg text-white font-semibold mt-2 tracking-wide">
+                festas realizadas em Orlando
+              </p>
+              <p className="text-xs md:text-sm text-text-muted mt-1 font-medium">
+                e a sua pode ser a próxima 🎤
+              </p>
+            </div>
           </div>
           
           <div className="relative">
@@ -848,6 +996,31 @@ export default function App() {
                 <ChevronRight size={18} />
               </button>
             </div>
+          </div>
+
+          {/* Adição 3: Botão de compartilhamento 'Indicar para um amigo' */}
+          <div className="mt-10 flex flex-col items-center text-center">
+            <p className="text-xs md:text-sm text-text-muted mb-3 font-medium">
+              Conhece alguém que vai amar isso? 😄
+            </p>
+            <button
+              onClick={handleShare}
+              className="px-7 py-3 text-sm font-bold border-[1.5px] border-[#e040fb] text-[#e040fb] bg-transparent rounded-full transition-all duration-300 hover:bg-[#e040fb] hover:text-white hover:shadow-[0_0_15px_rgba(224,64,251,0.5)] hover:scale-105 active:scale-95 max-[480px]:w-full max-[480px]:max-w-[260px] mx-auto cursor-pointer"
+            >
+              📲 Indicar para um Amigo
+            </button>
+            <AnimatePresence>
+              {showShareToast && (
+                <motion.p
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="text-xs text-green-400 mt-3 font-medium tracking-wide"
+                >
+                  ✅ Link copiado! Cole no WhatsApp ou Instagram para indicar.
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </section>

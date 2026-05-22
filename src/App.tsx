@@ -336,7 +336,7 @@ export default function App() {
       setShowShareToast(true);
       setTimeout(() => {
         setShowShareToast(false);
-      }, 3000);
+      }, 4000);
     }).catch(() => {
       try {
         const tempInput = document.createElement("textarea");
@@ -348,7 +348,7 @@ export default function App() {
         setShowShareToast(true);
         setTimeout(() => {
           setShowShareToast(false);
-        }, 3000);
+        }, 4000);
       } catch (e) {
         console.error("Clipboard copy failed", e);
       }
@@ -358,19 +358,13 @@ export default function App() {
   const handleShare = async () => {
     const textoCompleto = `🎤 Olha que serviço incrível aqui em Orlando!\n\nEles levam um karaokê profissional até a sua casa, Airbnb ou salão de festa — com entrega, instalação e mais de 25.000 músicas. Atendimento 100% em português! Perfeito para festas e aniversários 🎉\n\nAcesse agora: https://www.braziokeorlando.com`;
 
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          text: textoCompleto
-        });
-      } catch (err) {
-        if (err instanceof Error && err.name !== 'AbortError') {
-          copyFallback(textoCompleto);
-        }
-      }
-    } else {
-      copyFallback(textoCompleto);
-    }
+    // 1. Sempre copia o texto completo para a área de transferência como segurança
+    copyFallback(textoCompleto);
+
+    // 2. Abre o link direto do WhatsApp passando o texto completo via parâmetro de URL.
+    // Isso garante que mesmo se o usuário buscar e escolher o contato manualmente, a mensagem continuará preenchida perfeitamente no chat.
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoCompleto)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   useEffect(() => {
@@ -1017,7 +1011,7 @@ export default function App() {
                   exit={{ opacity: 0, y: -5 }}
                   className="text-xs text-green-400 mt-3 font-medium tracking-wide"
                 >
-                  ✅ Link copiado! Cole no WhatsApp para indicar.
+                  ✅ Mensagem copiada! Abrindo WhatsApp para você enviar...
                 </motion.p>
               )}
             </AnimatePresence>

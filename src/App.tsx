@@ -89,8 +89,8 @@ const PACKAGES = [
 ];
 
 const OPTIONALS = [
-  { icon: <Tv size={32} />, name: 'TV Compacta 32"', desc: 'Ideal para espaços menores', price: '+$30', value: 30 },
-  { icon: <Tv size={32} />, name: 'TV Grande 43"', desc: 'Para grupos maiores', price: '+$50', value: 50 },
+  { icon: <Tv size={32} />, name: 'TV - 32', desc: 'Ideal para espaços menores', price: '+$30', value: 30 },
+  { icon: <Tv size={32} />, name: 'TV - 43', desc: 'Para grupos maiores', price: '+$50', value: 50 },
   { icon: <Lightbulb size={32} />, name: 'Jogo de Luz', desc: 'Efeitos de luz para animar a festa', price: '+$20', value: 20 },
 ];
 
@@ -112,6 +112,12 @@ const TESTIMONIALS = [
     author: 'Fernanda L.',
     event: 'Chá de bebê • Winter Park, FL',
     initials: 'FL'
+  },
+  {
+    text: '"Cara, foi bom demais! Aluguei pro churrasco de aniversário do meu marido e a galera pirou, cantamos até ficar roucos. O som é limpo, o sistema de escolha de músicas é facinho e os caras montam rapidão. Valeu cada centavo!"',
+    author: 'Thiago Rocha',
+    event: 'Churrasco de Aniversário • Orlando, FL',
+    initials: 'TR'
   }
 ];
 
@@ -305,6 +311,14 @@ export default function App() {
   const nextTestimonial = () => setCurrentTestimonial((prev) => (prev + 1) % TESTIMONIALS.length);
   const prevTestimonial = () => setCurrentTestimonial((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
 
+  // Autoplay Testimonial Carousel: 5s
+  useEffect(() => {
+    const timer = setInterval(() => {
+      nextTestimonial();
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   const [formData, setFormData] = useState({
     nome: '',
     data: '',
@@ -397,9 +411,6 @@ export default function App() {
 
           {/* Mobile Toggle */}
           <div className="flex items-center gap-4 lg:hidden">
-            <a href="tel:+16892769150" className="p-2 bg-primary/20 rounded-full text-white md:hidden">
-              <Phone size={24} />
-            </a>
             <button className="text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
@@ -584,51 +595,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* Why Choose Us */}
-      <section className="py-12 md:py-24 bg-bg-dark/50">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold mb-4">Experiência <span className="text-primary">Premium</span> Garantida</h2>
-            <p className="text-text-muted italic">Você no palco, nós cuidamos de todo o resto.</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { 
-                icon: <Shield className="text-primary" />, 
-                title: 'Cuidado & Qualidade', 
-                desc: 'Sistemas de som de alta fidelidade e tecnologia de ponta. Microfones profissionais que garantem uma captação vocal límpida e livre de interferências.' 
-              },
-              { 
-                icon: <Clock className="text-primary" />, 
-                title: 'Pontualidade Local', 
-                desc: 'Especialistas na região de Orlando com rigoroso compromisso com a pontualidade. Garantimos uma logística eficiente para que sua única tarefa seja subir ao palco.' 
-              },
-              { 
-                icon: <ThumbsUp className="text-primary" />, 
-                title: 'Suporte VIP 24h', 
-                desc: 'Nada interrompe seu show. Nosso suporte via WhatsApp está ativo durante toda a sua festa para qualquer ajuste.' 
-              },
-            ].map((feature, idx) => (
-              <motion.div 
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="glass-card p-8 hover:bg-white/5 transition-all text-left group border-primary/10"
-              >
-                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                <p className="text-text-muted text-sm leading-relaxed">{feature.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* How it Works */}
       <section id="como-funciona" className="py-12 md:py-20">
         <div className="container mx-auto px-6">
@@ -792,16 +758,19 @@ export default function App() {
             <p className="text-text-muted">Turbine sua festa com extras incríveis</p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-3 gap-2.5 md:gap-6 max-w-4xl mx-auto">
             {OPTIONALS.map((opt, idx) => (
-              <div key={idx} className="glass-card p-6 flex items-center gap-6 group hover:border-primary/50">
-                <div className="text-primary group-hover:scale-110 transition-transform">
+              <div 
+                key={idx} 
+                className="glass-card p-3 md:p-6 flex flex-col items-center text-center gap-2 md:gap-4 group hover:border-primary/50 transition-all duration-300"
+              >
+                <div className="text-primary group-hover:scale-110 transition-transform [&_svg]:w-6 [&_svg]:h-6 md:[&_svg]:w-8 md:[&_svg]:h-8 bg-white/5 p-2 rounded-xl">
                   {opt.icon}
                 </div>
-                <div>
-                  <h3 className="font-bold text-lg">{opt.name}</h3>
-                  <p className="text-text-muted text-sm">{opt.desc}</p>
-                  <p className="text-primary font-bold mt-1 text-lg">{opt.price}</p>
+                <div className="flex flex-col items-center">
+                  <h3 className="font-bold text-xs sm:text-base md:text-lg text-white leading-tight">{opt.name}</h3>
+                  <p className="text-text-muted text-[10px] sm:text-xs md:text-sm mt-1 leading-snug hidden md:block">{opt.desc}</p>
+                  <p className="text-primary font-extrabold mt-1 text-xs sm:text-base md:text-lg">{opt.price}</p>
                 </div>
               </div>
             ))}
@@ -819,61 +788,65 @@ export default function App() {
             <p className="text-text-muted">Mais de 150 festas realizadas em toda região de Orlando</p>
           </div>
           
-          <div className="relative max-w-5xl mx-auto">
-            {/* Desktop View */}
-            <div className="hidden md:grid grid-cols-3 gap-6">
-              {TESTIMONIALS.map((t, idx) => (
-                <div key={idx} className="glass-card p-8 flex flex-col justify-between hover:bg-white/10">
-                  <div>
-                    <div className="flex text-yellow-500 mb-4">
-                      {Array(5).fill(0).map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
-                    </div>
-                    <p className="text-white/90 italic text-sm leading-relaxed mb-6">{t.text}</p>
+          <div className="relative max-w-3xl mx-auto animate-fade-in">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentTestimonial}
+                initial={{ opacity: 0, scale: 0.96, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: -10 }}
+                transition={{ duration: 0.4 }}
+                className="glass-card p-6 md:p-12 min-h-[280px] md:min-h-[300px] flex flex-col justify-between relative overflow-hidden group hover:border-primary/45 transition-all duration-300"
+              >
+                <div>
+                  <div className="flex text-yellow-500 mb-6 justify-center">
+                    {Array(5).fill(0).map((_, i) => (
+                      <Star key={i} size={18} fill="currentColor" className="mx-0.5" />
+                    ))}
                   </div>
-                  <div>
-                    <h4 className="font-bold text-sm text-white">{t.author}</h4>
-                    <p className="text-[10px] text-text-muted uppercase tracking-wider">{t.event}</p>
-                  </div>
+                  <p className="text-white/95 italic text-sm md:text-lg text-center leading-relaxed font-semibold mb-6">
+                    {TESTIMONIALS[currentTestimonial].text}
+                  </p>
                 </div>
-              ))}
-            </div>
-
-            {/* Mobile View / Carousel */}
-            <div className="md:hidden">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentTestimonial}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="glass-card p-8 min-h-[300px] flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex text-yellow-500 mb-4">
-                      {Array(5).fill(0).map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
-                    </div>
-                    <p className="text-white/90 italic text-lg leading-relaxed mb-6">{TESTIMONIALS[currentTestimonial].text}</p>
+                
+                <div className="text-center pt-6 border-t border-white/5 flex flex-col items-center">
+                  <div className="w-10 h-10 rounded-full bg-primary/25 border border-primary/50 flex items-center justify-center font-bold text-sm text-primary mb-2 shadow-[0_0_10px_rgba(224,64,251,0.2)]">
+                    {TESTIMONIALS[currentTestimonial].initials}
                   </div>
-                  <div>
-                    <h4 className="font-bold text-base text-white">{TESTIMONIALS[currentTestimonial].author}</h4>
-                    <p className="text-xs text-text-muted">{TESTIMONIALS[currentTestimonial].event}</p>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-              
-              <div className="flex items-center justify-center gap-4 mt-8">
-                <button onClick={prevTestimonial} className="p-2 border border-white/20 rounded-full hover:bg-primary hover:border-primary">
-                  <ChevronLeft />
-                </button>
-                <div className="flex gap-2">
-                  {TESTIMONIALS.map((_, i) => (
-                    <div key={i} className={`w-2 h-2 rounded-full transition-all ${currentTestimonial === i ? 'bg-primary w-6' : 'bg-white/20'}`} />
-                  ))}
+                  <h4 className="font-extrabold text-white text-base md:text-lg">{TESTIMONIALS[currentTestimonial].author}</h4>
+                  <p className="text-[10px] md:text-xs text-text-muted font-bold uppercase tracking-widest mt-1">
+                    {TESTIMONIALS[currentTestimonial].event}
+                  </p>
                 </div>
-                <button onClick={nextTestimonial} className="p-2 border border-white/20 rounded-full hover:bg-primary hover:border-primary">
-                  <ChevronRight />
-                </button>
+              </motion.div>
+            </AnimatePresence>
+            
+            {/* Nav controls */}
+            <div className="flex items-center justify-center gap-4 mt-8">
+              <button 
+                onClick={prevTestimonial} 
+                className="p-2.5 border border-white/10 rounded-full bg-white/5 hover:bg-primary hover:border-primary transition-all duration-300 hover:scale-105 active:scale-95 text-white cursor-pointer"
+                aria-label="Previous testimonial"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <div className="flex gap-2">
+                {TESTIMONIALS.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentTestimonial(i)}
+                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${currentTestimonial === i ? 'bg-primary w-6' : 'bg-white/20 hover:bg-white/40 w-2'}`}
+                    aria-label={`Go to testimonial ${i + 1}`}
+                  />
+                ))}
               </div>
+              <button 
+                onClick={nextTestimonial} 
+                className="p-2.5 border border-white/10 rounded-full bg-white/5 hover:bg-primary hover:border-primary transition-all duration-300 hover:scale-105 active:scale-95 text-white cursor-pointer"
+                aria-label="Next testimonial"
+              >
+                <ChevronRight size={18} />
+              </button>
             </div>
           </div>
         </div>
@@ -988,7 +961,7 @@ export default function App() {
                     </div>
                     
                     <div className="space-y-4 pt-4 border-t border-white/10">
-                      <h4 className="text-sm font-bold uppercase tracking-widest text-primary">Pacote Desejado</h4>
+                      <h4 className="text-sm font-bold uppercase tracking-widest text-primary text-center">Pacote Desejado</h4>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         {PACKAGES.map((pkg) => (
                           <button
@@ -1217,13 +1190,8 @@ export default function App() {
       </AnimatePresence>
 
       {/* Floating WhatsApp Button */}
-      <div className="hidden md:block fixed bottom-2 right-2 md:bottom-4 md:right-4 z-[60] select-none pointer-events-none">
+      <div className="fixed max-[480px]:bottom-[-8px] max-[480px]:right-[-8px] bottom-2 right-2 md:bottom-4 md:right-4 z-[60] select-none pointer-events-none">
         <div className="relative pointer-events-auto">
-          {/* Badge compacto minimalista estilo notificação */}
-          <div className="absolute max-[480px]:top-[8px] max-[480px]:right-[8px] min-[481px]:top-4 min-[481px]:right-4 md:top-6 md:right-6 bg-primary text-white text-[10px] font-bold px-[5px] py-[2px] rounded-full shadow-[0_2px_10px_rgba(224,64,251,0.5)] z-10 flex items-center justify-center whitespace-nowrap animate-pulse">
-            ⚡5min
-          </div>
-
           <motion.a 
             href="https://wa.me/16892769150?text=Olá,%20BRAZIOKÊ!%20🎤%20Vim%20pelo%20site%20e%20tenho%20interesse%20em%20alugar%20o%20karaokê%20para%20minha%20festa%20em%20Orlando.%20Podem%20me%20ajudar?"
             target="_blank"
@@ -1239,11 +1207,11 @@ export default function App() {
             className="block"
             aria-label="Falar no WhatsApp"
           >
-            <div className="max-[480px]:w-[64px] max-[480px]:h-[64px] min-[481px]:w-24 min-[481px]:h-24 md:w-36 md:h-36 flex items-center justify-center hover:scale-110 transition-transform duration-300 drop-shadow-[0_10px_15px_rgba(0,0,0,0.3)]">
+            <div className="max-[480px]:w-[124px] max-[480px]:h-[124px] min-[481px]:w-24 min-[481px]:h-24 md:w-36 md:h-36 flex items-center justify-center hover:scale-110 transition-transform duration-300 drop-shadow-[0_10px_15px_rgba(0,0,0,0.3)]">
               <img 
                 src="https://i.imgur.com/JW5EuSf.png" 
                 alt="WhatsApp" 
-                className="max-[480px]:w-[36px] max-[480px]:h-[36px] w-full h-full object-contain"
+                className="w-full h-full object-contain"
               />
             </div>
           </motion.a>
